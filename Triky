@@ -1,0 +1,55 @@
+import tkinter as tk
+from tkinter import messagebox
+
+class Triqui:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Triki")
+
+        self.turno = "X"
+        self.tablero = [[" " for _ in range(3)] for _ in range(3)]
+
+        for i in range(3):
+            for j in range(3):
+                btn = tk.Button(self.root, text=" ", width=10, height=3,
+                                command=lambda i=i, j=j: self.jugar(i, j))
+                btn.grid(row=i, column=j)
+
+    def jugar(self, fila, columna):
+        if self.tablero[fila][columna] == " ":
+            self.tablero[fila][columna] = self.turno
+            self.actualizar()
+            if self.verificar(self.turno):
+                messagebox.showinfo("Fin del juego", f"¡El jugador {self.turno} Gano!")
+                self.root.quit()
+            elif all(self.tablero[i][j] != " " for i in range(3) for j in range(3)):
+                messagebox.showinfo("Fin del juego", "¡Empate!")
+                self.root.quit()
+            else:
+                self.turno = "0" if self.turno == "X" else "X"
+
+    def verificar(self, jugador):
+        for fila in self.tablero:
+            if all(casilla == jugador for casilla in fila):
+                return True
+
+        for columna in range(3):
+            if all(self.tablero[i][columna] == jugador for i in range(3)):
+                return True
+
+        if all(self.tablero[i][i] == jugador for i in range(3)) or all(self.tablero[i][2-i] == jugador for i in range(3)):
+            return True
+
+        return False
+
+    def actualizar(self):
+        for i in range(3):
+            for j in range(3):
+                text = self.tablero[i][j]
+                for widget in self.root.winfo_children():
+                    if widget.grid_info()["row"] == i and widget.grid_info()["column"] == j:
+                        widget.config(text=text)
+
+root = tk.Tk()
+app = Triqui(root)
+root.mainloop()
